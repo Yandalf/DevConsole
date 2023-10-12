@@ -1,26 +1,43 @@
 {
-  "consoleMacros": [
+  "consoleMethods": [
     {
-      "attribute": {
-        "MacroName": "GetByInstanceID",
-        "ArgumentTypes": [
-          "System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-        ],
-        "TypeId": "com.SolePilgrim.DevConsole.ConsoleMacroAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
-      },
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-      "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
-      "methodName": "GetByInstanceID"
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "GetValidMethods",
+      "argumentTypeNames": [
+        "System.Type"
+      ]
     },
     {
-      "attribute": {
-        "MacroName": "Player",
-        "ArgumentTypes": [],
-        "TypeId": "com.SolePilgrim.DevConsole.ConsoleMacroAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
-      },
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
+      "methodName": "GetByInstanceID",
+      "argumentTypeNames": [
+        "com.SolePilgrim.Instancing.InstanceMapper",
+        "System.Int32"
+      ]
+    },
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
+      "methodName": "Log",
+      "argumentTypeNames": [
+        "UnityEngine.Object"
+      ]
+    },
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
+      "methodName": "LogComponents",
+      "argumentTypeNames": [
+        "UnityEngine.GameObject"
+      ]
+    },
+    {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
       "typeName": "com.SolePilgrim.DevConsole.Unity.UnityDemoDevConsoleCommands",
-      "methodName": "GetPlayer"
+      "methodName": "GetPlayer",
+      "argumentTypeNames": []
     }
   ]
 }

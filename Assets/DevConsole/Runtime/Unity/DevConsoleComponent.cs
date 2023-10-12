@@ -35,7 +35,8 @@ namespace com.SolePilgrim.DevConsole.Unity
 
 		private void Awake()
 		{
-			DevConsole = new DevConsole(_consoleCommandsFile.text, "^[\\d-]\\d*$"); //This regex matches Unity's InstanceID format: a positive or negative integer.
+			var parser = new DevConsoleParser(DevConsoleUtilities.IntegerRegexPattern, DevConsoleUtilities.CSharpMethodRegexPattern);
+			DevConsole = new DevConsole(_consoleCommandsFile.text, parser, InstanceMapper.InstanceMapper);
 		}
 
 		private void Update()

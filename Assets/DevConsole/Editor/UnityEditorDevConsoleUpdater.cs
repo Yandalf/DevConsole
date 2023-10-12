@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Linq;
-using System.Reflection;
 using System.IO;
 
 namespace com.SolePilgrim.DevConsole.Unity
@@ -28,13 +27,11 @@ namespace com.SolePilgrim.DevConsole.Unity
 		[MenuItem("SolePilgrim/DevConsole/Update Console Commands")]
 		static private void FindAllConsoleCommands()
 		{
-			DevConsoleCommandSearcher.FindAllConsoleCommands(out var methods, out var macros, out var types);
+			DevConsoleCommandSearcher.FindAllConsoleCommands(out var methods);
 			Debug.Log($"{nameof(UnityEditorDevConsoleUpdater)}.{nameof(FindAllConsoleCommands)}" +
-				$"\nFound methods: {methods.Count()}\n{string.Join("\n", methods.Select(m => $"-{m.Name}"))}" +
-				$"\nFound Macros: {macros.Count()}\n{string.Join("\n", macros.Select(m => $"-{m.Name}"))}" + 
-				$"\nFound Classes: {types.Count()}\n{string.Join("\n", types.Select(t => $"-{t.Name}"))}");
+				$"\nFound methods: {methods.Count()}\n{string.Join("\n", methods.Select(m => $"-{m.Name}"))}");
 			//The methods found here need to become accessible for the Console to call upon the correct objects.
-			var allSerialized = DevConsoleCommandSearcher.ConsoleCommandsToString(macros, Newtonsoft.Json.Formatting.Indented);
+			var allSerialized = DevConsoleCommandSearcher.ConsoleCommandsToString(methods, Newtonsoft.Json.Formatting.Indented); //TODO remove this indented parameter
 			Debug.Log(allSerialized);
 			CreateOrEditTextAsset(allSerialized);
 		}

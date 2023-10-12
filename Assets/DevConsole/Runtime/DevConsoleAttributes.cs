@@ -2,12 +2,6 @@
 
 namespace com.SolePilgrim.DevConsole
 {
-	[AttributeUsage(AttributeTargets.Method)]
-	public class ConsoleMethodAttribute : Attribute
-	{
-
-	}
-
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field)]
 	public class ConsoleVariableAttribute : Attribute
     {
@@ -21,22 +15,11 @@ namespace com.SolePilgrim.DevConsole
     }
 
 	[AttributeUsage(AttributeTargets.Method)]
-	public class ConsoleMacroAttribute : Attribute
+	public class ConsoleMethodAttribute : Attribute
 	{
-		public string MacroName { get; private set; }
-		public Type[] ArgumentTypes { get; private set; }
-
-
-		public ConsoleMacroAttribute(string macroName, Type[] args)
+		public ConsoleCommand GetCommand()
 		{
-			MacroName = macroName;
-			ArgumentTypes = args;
+			throw new NotImplementedException();
 		}
-	}
-
-	[AttributeUsage(AttributeTargets.Class)]
-	public class ConsoleClassAttribute : Attribute
-	{
-
 	}
 }

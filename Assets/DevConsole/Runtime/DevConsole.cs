@@ -1,32 +1,28 @@
-﻿using System;
+﻿using com.SolePilgrim.Instancing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace com.SolePilgrim.DevConsole
 {
-    public class DevConsole
-	{
-		private delegate object ConsoleCommand(out string log, object commandTarget = null);
+	public delegate object ConsoleCommand(out string log, object commandTarget = null);
 
+	public class DevConsole
+	{
 		public List<DevConsoleEntry> Entries { get; private set; } = new List<DevConsoleEntry>();
 		public SerializableConsoleCommands Commands { get; private set; }
-
-		private readonly Regex _instanceIdRegex;
-		//This Regex works as follows:
-		//first symbol has to be underscore or lowercase letter, followed by any lowercase letters, numbers, or underscores (\w). This is group 1.
-		//Next a single opening bracket, and at the very end a closing bracket. Between the brackets is group 2.
-		//Group 2 accepts EITHER any amount of \w (0 or 1 argument), OR at least one \w followed by any repetitions of single "," followed by at least one \w (multiple arguments). This prevents empty arguments.
-		private readonly Regex _methodRegex = new("^([a-z_]+\\w*)\\((\\w*|\\w+(\\,\\w+)*)\\)$");
+		public DevConsoleParser Parser { get; private set; }
+		public InstanceMapper Mapper { get; private set; }
 
 		static private readonly string InvalidCommandOutput = "Unrecognized Command!";
 
 
-		public DevConsole(string serializedCommands, string instanceIdRegexPattern)
-        {
-			Commands = DevConsoleCommandSearcher.StringToConsoleCommands(serializedCommands);
-			_instanceIdRegex = new Regex(instanceIdRegexPattern);
-        }
+		public DevConsole(string serializedCommands, DevConsoleParser parser, InstanceMapper mapper)
+		{
+			Parser		= parser;
+			Commands	= DevConsoleCommandSearcher.StringToConsoleCommands(serializedCommands);
+			Mapper		= mapper;
+		}
 
 		public void EnterCommand(string input)
 		{
@@ -63,13 +59,26 @@ namespace com.SolePilgrim.DevConsole
 		private ConsoleCommand ParseCommand(string command)
         {
 			UnityEngine.Debug.Log(command);
-			if (_instanceIdRegex.IsMatch(command))
+			if (Parser.instanceIDRegex.IsMatch(command))
             {
-				UnityEngine.Debug.Log($"Command {command} is an InstanceID!");
+				var instanceID = int.Parse(command);
+				return (out string s, object o) => 
+				{
+					var result = Mapper.GetObjectByInstanceID(instanceID);
+					s = $"{instanceID}-{result}";
+					return result;
+				};
             }
-			else if (_methodRegex.IsMatch(command))
+			else if (Parser.methodRegex.IsMatch(command))
 			{
-				UnityEngine.Debug.Log($"Command {command} is a method!");
+				var matches = Parser.methodRegex.Matches(command);
+				UnityEngine.Debug.Log($"Command {command} is a method! Matches: {string.Join("|", matches.Select(m => string.Join(",", m.Groups)))}");
+				var method = Commands.consoleMethods.First(m => m.methodName == matches.First().Groups.First().Value); //TODO working on this!
+				return (out string s, object o) =>
+				{
+					s = $"";
+					return o;
+				};
 			}
 			return null;
         }
