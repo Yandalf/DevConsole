@@ -52,8 +52,8 @@ namespace com.SolePilgrim.DevConsole
 			}
 			catch(Exception e)
             {
-				return $"{e.Message}\n{e.StackTrace}";
-            }
+				return e.Message + (e is BadParseCommandException ? string.Empty : $"\n{e.StackTrace}");
+			}
 		}
 
 		private ConsoleCommand ParseCommand(string command)
@@ -80,7 +80,12 @@ namespace com.SolePilgrim.DevConsole
 					return o;
 				};
 			}
-			return null;
+			throw new BadParseCommandException(command);
         }
+
+		private class BadParseCommandException : Exception
+		{
+			public BadParseCommandException(string command) : base($"Unrecognized Command:{command}") { }
+		}
 	}
 }
