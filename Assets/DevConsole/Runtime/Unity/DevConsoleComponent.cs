@@ -18,6 +18,8 @@ namespace com.SolePilgrim.DevConsole.Unity
 
 		[SerializeField, Tooltip("Keyboard key used to toggle the console.")]
 		private KeyCode _toggleConsoleKey = KeyCode.Tilde;
+		[SerializeField, Tooltip("TextAsset containing all the possible commands for the console.")]
+		private TextAsset _consoleCommandsFile;
 
 		/// <summary>String the Input field writes to.</summary>
 		private string _inputLine;
@@ -33,7 +35,7 @@ namespace com.SolePilgrim.DevConsole.Unity
 
 		private void Awake()
 		{
-			DevConsole = new DevConsole();
+			DevConsole = new DevConsole(_consoleCommandsFile.text, "^[\\d-]\\d*$"); //This regex matches Unity's InstanceID format: a positive or negative integer.
 		}
 
 		private void Update()

@@ -1,26 +1,29 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using System.Reflection;
+using System.IO;
 
 namespace com.SolePilgrim.DevConsole.Unity
 {
 	/// <summary>Wraps DevConsoleCommandSearcher for the Unity Editor.</summary>
 	static internal class UnityEditorDevConsoleUpdater
 	{
+		//TODO find a way to ensure this only runs when scripts are recompiled. Now any kind of (re)import triggers this, which will be very inconvenient for devs.
 		//[UnityEditor.Callbacks.DidReloadScripts]
-		static private void OnScriptReload()
-		{
-			Debug.Log($"IsPlaying: {EditorApplication.isPlayingOrWillChangePlaymode} IsCompiling: {EditorApplication.isCompiling} IsUpdating: {EditorApplication.isUpdating}");
-			if (EditorApplication.isPlayingOrWillChangePlaymode) //Don't run this on play mode
-			{
-				return;
-			}
-			if (EditorApplication.isCompiling || EditorApplication.isUpdating)
-			{
-				EditorApplication.delayCall += FindAllConsoleCommands;
-				return;
-			}
-		}
+		//static private void OnScriptReload()
+		//{
+		//	Debug.Log($"IsPlaying: {EditorApplication.isPlayingOrWillChangePlaymode} IsCompiling: {EditorApplication.isCompiling} IsUpdating: {EditorApplication.isUpdating}");
+		//	if (EditorApplication.isPlayingOrWillChangePlaymode) //Don't run this on play mode
+		//	{
+		//		return;
+		//	}
+		//	if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+		//	{
+		//		EditorApplication.delayCall += FindAllConsoleCommands;
+		//		return;
+		//	}
+		//}
 
 		[MenuItem("SolePilgrim/DevConsole/Update Console Commands")]
 		static private void FindAllConsoleCommands()
@@ -31,6 +34,25 @@ namespace com.SolePilgrim.DevConsole.Unity
 				$"\nFound Macros: {macros.Count()}\n{string.Join("\n", macros.Select(m => $"-{m.Name}"))}" + 
 				$"\nFound Classes: {types.Count()}\n{string.Join("\n", types.Select(t => $"-{t.Name}"))}");
 			//The methods found here need to become accessible for the Console to call upon the correct objects.
+			var allSerialized = DevConsoleCommandSearcher.ConsoleCommandsToString(macros, Newtonsoft.Json.Formatting.Indented);
+			Debug.Log(allSerialized);
+			CreateOrEditTextAsset(allSerialized);
 		}
+
+		static private void CreateOrEditTextAsset(string serializedText)
+        {
+			var dirPath = Path.Combine(Application.dataPath, "Resources", "DevConsole");
+			var filePath = Path.Combine(dirPath, "ConsoleCommands.txt");
+			if (!Directory.Exists(dirPath))
+            {
+				Directory.CreateDirectory(dirPath);
+            }
+			if (!File.Exists(filePath))
+            {
+				File.Create(filePath).Close();
+            }
+			File.WriteAllText(filePath, serializedText);
+			AssetDatabase.Refresh();
+        }
 	}
 }

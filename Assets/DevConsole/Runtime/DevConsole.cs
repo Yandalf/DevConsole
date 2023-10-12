@@ -1,13 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace com.SolePilgrim.DevConsole
 {
-	public class DevConsole
+    public class DevConsole
 	{
+		private delegate object ConsoleCommand(out string log, object commandTarget = null);
+
 		public List<DevConsoleEntry> Entries { get; private set; } = new List<DevConsoleEntry>();
+		public SerializableConsoleCommands Commands { get; private set; }
+
+		private readonly Regex _instanceIdRegex;
+		//This Regex works as follows:
+		//first symbol has to be underscore or lowercase letter, followed by any lowercase letters, numbers, or underscores (\w). This is group 1.
+		//Next a single opening bracket, and at the very end a closing bracket. Between the brackets is group 2.
+		//Group 2 accepts EITHER any amount of \w (0 or 1 argument), OR at least one \w followed by any repetitions of single "," followed by at least one \w (multiple arguments). This prevents empty arguments.
+		private readonly Regex _methodRegex = new("^([a-z_]+\\w*)\\((\\w*|\\w+(\\,\\w+)*)\\)$");
 
 		static private readonly string InvalidCommandOutput = "Unrecognized Command!";
 
+
+		public DevConsole(string serializedCommands, string instanceIdRegexPattern)
+        {
+			Commands = DevConsoleCommandSearcher.StringToConsoleCommands(serializedCommands);
+			_instanceIdRegex = new Regex(instanceIdRegexPattern);
+        }
 
 		public void EnterCommand(string input)
 		{
@@ -22,41 +41,37 @@ namespace com.SolePilgrim.DevConsole
 
 		private string ProcessInput(string input)
 		{
-			var openBracketIndex	= input.IndexOf('(');
-			var closeBracketIndex	= input.LastIndexOf(')');
-			var commandParts	= input.Substring(0, openBracketIndex > 0 ? openBracketIndex : input.Length).Split('.');
-			var commandArgs		= input.Substring(openBracketIndex + 1, closeBracketIndex > 0 ? closeBracketIndex - openBracketIndex - 1 : 0).Split(',');
-			//TODO istead of naievely splitting Args, we should partition into discrete method groups. This to allow constructions like "object.method1(arg1, arg2).method2().method3(arg1)"
-			//UnityEngine.Debug.Log($"CommandParts: {string.Join(',', commandParts)}\nArguments: {string.Join(',', commandArgs)}");
-			//TODO
-			//First check Parts to figure out if we have a Macro or a regular Command structure. 
-			//-Macro: single part that corresponds to a Macro Name.
-			//-Command: An Instance ID to be turned into an object followed by one or more valid commands.
-			//Next check if Args neatly fit the given command or macro.
-			return InvalidCommandOutput;
-		}
-	}
-
-	/// <summary>DevConsole Command Input and Output data.</summary>
-	public struct DevConsoleEntry
-	{
-		public string Input		{ get; private set; }
-		public string Output	{ get; private set; }
-
-		static private readonly int _paddingSpaces = 4;
-
-
-		public DevConsoleEntry(string input, string output)
-		{
-			Input = input;
-			Output = output;
+            try
+            {
+				//Lowercase everything and remove unnecessary spaces
+				var discreteCommands	= input.ToLower().Replace(" ","").Split('.').Select(t => ParseCommand(t)).ToArray();
+				var log					= string.Empty;
+				var commandReturn		= discreteCommands[0].Invoke(out log);
+				for (int i = 1; i < discreteCommands.Length; i++)
+				{
+					commandReturn = discreteCommands[i].Invoke(out string logAdd, commandReturn);
+					log += "\n" + logAdd;
+				}
+				return log;
+			}
+			catch(Exception e)
+            {
+				return $"{e.Message}\n{e.StackTrace}";
+            }
 		}
 
-		public override string ToString()
-		{
-			return Input +
-				(string.IsNullOrEmpty(Output) ? "" :
-				"\n" + new string(' ', _paddingSpaces) + Output.Replace("\n", "\n" + new string(' ', _paddingSpaces)));
-		}
+		private ConsoleCommand ParseCommand(string command)
+        {
+			UnityEngine.Debug.Log(command);
+			if (_instanceIdRegex.IsMatch(command))
+            {
+				UnityEngine.Debug.Log($"Command {command} is an InstanceID!");
+            }
+			else if (_methodRegex.IsMatch(command))
+			{
+				UnityEngine.Debug.Log($"Command {command} is a method!");
+			}
+			return null;
+        }
 	}
 }
