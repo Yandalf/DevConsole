@@ -8,10 +8,10 @@ namespace com.SolePilgrim.DevConsole
 		public readonly Regex instanceIDRegex, methodRegex;
 
 
-		public DevConsoleParser(string instanceIdPattern, string methodPattern)
+		public DevConsoleParser(Regex instanceIdRegex, Regex methodRegex)
 		{
-			instanceIDRegex = new Regex(instanceIdPattern);
-			methodRegex		= new Regex(methodPattern);
+			instanceIDRegex		= instanceIdRegex;
+			this.methodRegex	= methodRegex;
 		}
 	}
 }

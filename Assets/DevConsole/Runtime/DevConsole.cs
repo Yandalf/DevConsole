@@ -58,14 +58,12 @@ namespace com.SolePilgrim.DevConsole
 
 		private ConsoleCommand ParseCommand(string command)
         {
-			UnityEngine.Debug.Log(command);
 			if (Parser.instanceIDRegex.IsMatch(command))
             {
-				var instanceID = int.Parse(command);
 				return (out string s, object o) => 
 				{
-					var result = Mapper.GetObjectByInstanceID(instanceID);
-					s = $"{instanceID}-{result}";
+					var result = Mapper.GetObjectByInstanceID(command);
+					s = $"{command}-{result}";
 					return result;
 				};
             }
