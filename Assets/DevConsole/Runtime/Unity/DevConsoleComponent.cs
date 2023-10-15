@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 namespace com.SolePilgrim.DevConsole.Unity
 {
-	/// <summary>Controls a DevConsole.</summary>
+	/// <summary>Unity Component to control a DevConsole.</summary>
 	public class DevConsoleComponent : MonoBehaviour
 	{
 		/// <summary>The controlled DevConsole.</summary>
