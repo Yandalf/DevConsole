@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -35,7 +36,9 @@ namespace com.SolePilgrim.DevConsole.Unity
 
 		private void Awake()
 		{
-			var parser = new DevConsoleParser(DevConsoleUtilities.IntegerRegexPattern, DevConsoleUtilities.CSharpMethodRegexPattern);
+			var instanceIDRegex = new Regex(DevConsoleUtilities.IntegerRegex);
+			var methodRegex		= new Regex(DevConsoleUtilities.CSharpMethodRegex, RegexOptions.IgnoreCase);
+			var parser = new DevConsoleParser(instanceIDRegex, methodRegex, ',');
 			DevConsole = new DevConsole(_consoleCommandsFile.text, parser, InstanceMapper.InstanceMapper);
 		}
 

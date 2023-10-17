@@ -17,9 +17,5 @@ namespace com.SolePilgrim.DevConsole
 	[AttributeUsage(AttributeTargets.Method)]
 	public class ConsoleMethodAttribute : Attribute
 	{
-		public ConsoleCommand GetCommand()
-		{
-			throw new NotImplementedException();
-		}
 	}
 }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace com.SolePilgrim.DevConsole
 {
-	public delegate object ConsoleCommand(out string log, object commandTarget = null);
+	public delegate string ConsoleCommand(object commandTarget = null);
 
 	public class DevConsole
 	{
@@ -39,20 +39,11 @@ namespace com.SolePilgrim.DevConsole
 		{
             try
             {
-				//Lowercase everything and remove unnecessary spaces
-				var discreteCommands	= input.ToLower().Replace(" ","").Split('.').Select(t => ParseCommand(t)).ToArray();
-				var log					= string.Empty;
-				var commandReturn		= discreteCommands[0].Invoke(out log);
-				for (int i = 1; i < discreteCommands.Length; i++)
-				{
-					commandReturn = discreteCommands[i].Invoke(out string logAdd, commandReturn);
-					log += "\n" + logAdd;
-				}
-				return log;
+				return ParseCommand(input).Invoke();
 			}
 			catch(Exception e)
             {
-				return e.Message + (e is BadParseCommandException ? string.Empty : $"\n{e.StackTrace}");
+				return e.Message + (e is CommandException ? string.Empty : $"\n{e.StackTrace}");
 			}
 		}
 
@@ -60,30 +51,115 @@ namespace com.SolePilgrim.DevConsole
         {
 			if (Parser.instanceIDRegex.IsMatch(command))
             {
-				return (out string s, object o) => 
+				return (object o) => 
 				{
 					var result = Mapper.GetObjectByInstanceID(command);
-					s = $"{command}-{result}";
-					return result;
+					var s = $"{command}-{result}";
+					return s;
 				};
             }
 			else if (Parser.methodRegex.IsMatch(command))
 			{
-				var matches = Parser.methodRegex.Matches(command);
-				UnityEngine.Debug.Log($"Command {command} is a method! Matches: {string.Join("|", matches.Select(m => string.Join(",", m.Groups)))}");
-				var method = Commands.consoleMethods.First(m => m.methodName == matches.First().Groups.First().Value); //TODO working on this!
-				return (out string s, object o) =>
+				var match			= Parser.methodRegex.Match(command);
+				var methodGroup		= match.Groups.FirstOrDefault(g => g.Name == "method");
+				var arguments		= Parser.SplitArguments(match.Groups.FirstOrDefault(g => g.Name == "arguments")?.Value);
+				var method			= Commands.consoleMethods.Where(m => m.methodName == methodGroup.Name). //Find all methods with the correct name
+					FirstOrDefault(c => ArgumentsMatch(arguments, c.argumentTypes, out object[] converted)); //Find the method overload
+				UnityEngine.Debug.Log($"Found Method: {method?.methodName ?? "NULL"}");
+				return (object o) =>
 				{
-					s = $"";
-					return o;
+					return $"";
 				};
 			}
 			throw new BadParseCommandException(command);
         }
 
-		private class BadParseCommandException : Exception
+		//TODO ensure mismatches between arguments and argumentTypes with auto-injections like DevConsole
+		private bool ArgumentsMatch(string[] arguments, Type[] argumentTypes, out object[] converted)
 		{
-			public BadParseCommandException(string command) : base($"Unrecognized Command:{command}") { }
+			converted = new object[argumentTypes.Length];
+			if (arguments.Length != argumentTypes.Length)
+			{
+				return false;
+			}
+
+			for (int i = 0; i < arguments.Length && i < argumentTypes.Length; i++)
+			{
+				if (argumentTypes[i] == typeof(string))
+				{
+					converted[i] = arguments[i];
+				}
+				else if (argumentTypes[i] == typeof(int))
+				{
+					if (int.TryParse(arguments[i], out int result))
+					{
+						converted[i] = result;
+					}
+					else
+					{
+						return false;
+					}
+				}
+				else if (argumentTypes[i] == typeof(float))
+				{
+					if (float.TryParse(arguments[i], out float result))
+					{
+						converted[i] = result;
+					}
+					else
+					{
+						return false;
+					}
+				}
+				else if (Mapper.InstanceType.IsAssignableFrom(argumentTypes[i]))
+				{
+					if (Mapper.IsInstanceID(arguments[i]))
+					{
+						var result = Convert.ChangeType(Mapper.GetObjectByInstanceID(arguments[i]), argumentTypes[i]);
+						if (result == null)
+						{
+							return false;
+						}
+						converted[i] = result;
+					}
+					else
+					{
+						return false;
+					}
+				}
+				else if (argumentTypes[i] == typeof(Type))
+				{
+					var t = Type.GetType(arguments[i], false, true);
+					if (t != null)
+					{
+						converted[i] = t;
+					}
+					else
+					{
+						return false;
+					}
+				}
+				else if (argumentTypes[i] == typeof(DevConsole))
+				{
+					converted[i] = this;
+				}
+			}
+			return true;
 		}
+	}
+
+	abstract public class CommandException : Exception
+	{
+		public CommandException(string message) : base(message) { }
+	}
+
+	public class BadParseCommandException : CommandException
+	{
+		public BadParseCommandException(string command) : base($"Unrecognized DevConsoleCommand:{command}") { }
+	}
+
+	public class BadArgumentCommandException : CommandException
+	{
+		public BadArgumentCommandException(string command) : base($"Invalid DevConsoleCommand Arguments") { }
 	}
 }

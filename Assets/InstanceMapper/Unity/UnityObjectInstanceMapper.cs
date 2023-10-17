@@ -1,5 +1,6 @@
 ﻿using com.SolePilgrim.DevConsole;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -8,6 +9,14 @@ namespace com.SolePilgrim.Instancing
     /// <summary>Unity implementation of InstanceMapper.</summary>
     public class UnityObjectInstanceMapper : InstanceMapper<int, Object>
     {
+		private Regex _instanceID;
+
+
+		public UnityObjectInstanceMapper()
+		{
+			_instanceID = new Regex(DevConsoleUtilities.IntegerRegex);
+		}
+
         public override int GetInstanceIDFromObject(Object obj)
         {
             return obj.GetInstanceID();
@@ -15,7 +24,7 @@ namespace com.SolePilgrim.Instancing
 
 		public override bool IsInstanceID(string id)
 		{
-			return DevConsoleUtilities.IntegerRegexPattern.IsMatch(id);
+			return _instanceID.IsMatch(id);
 		}
 
 		public override void UpdateMapping()

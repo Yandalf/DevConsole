@@ -6,12 +6,19 @@ namespace com.SolePilgrim.DevConsole
 	public class DevConsoleParser
 	{
 		public readonly Regex instanceIDRegex, methodRegex;
+		public readonly char argumentSeparator;
 
 
-		public DevConsoleParser(Regex instanceIdRegex, Regex methodRegex)
+		public DevConsoleParser(Regex instanceIdRegex, Regex methodRegex, char argumentSeparator)
 		{
-			instanceIDRegex		= instanceIdRegex;
-			this.methodRegex	= methodRegex;
+			instanceIDRegex			= instanceIdRegex;
+			this.methodRegex		= methodRegex;
+			this.argumentSeparator	= argumentSeparator;
+		}
+
+		public string[] SplitArguments(string argumentsString)
+		{
+			return argumentsString.Split(argumentSeparator);
 		}
 	}
 }
