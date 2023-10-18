@@ -4,40 +4,55 @@
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
       "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
       "methodName": "GetValidMethods",
-      "argumentTypeNames": [
-        "System.Type"
+      "parameterTypeNames": [
+        "System.Type, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
       ]
     },
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-      "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
-      "methodName": "GetByInstanceID",
-      "argumentTypeNames": [
-        "com.SolePilgrim.Instancing.InstanceMapper",
-        "System.Int32"
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "Foo",
+      "parameterTypeNames": [
+        "System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      ]
+    },
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "Foo",
+      "parameterTypeNames": [
+        "System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      ]
+    },
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "Foo",
+      "parameterTypeNames": [
+        "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
       ]
     },
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
       "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
       "methodName": "Log",
-      "argumentTypeNames": [
-        "UnityEngine.Object"
+      "parameterTypeNames": [
+        "UnityEngine.Object, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
       ]
     },
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
       "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
       "methodName": "LogComponents",
-      "argumentTypeNames": [
-        "UnityEngine.GameObject"
+      "parameterTypeNames": [
+        "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
       ]
     },
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
       "typeName": "com.SolePilgrim.DevConsole.Unity.UnityDemoDevConsoleCommands",
       "methodName": "GetPlayer",
-      "argumentTypeNames": []
+      "parameterTypeNames": []
     }
   ]
 }

@@ -1,7 +1,9 @@
 ﻿using com.SolePilgrim.Instancing;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace com.SolePilgrim.DevConsole
 {
@@ -60,16 +62,25 @@ namespace com.SolePilgrim.DevConsole
             }
 			else if (Parser.methodRegex.IsMatch(command))
 			{
+				var converted		= new object[0];
 				var match			= Parser.methodRegex.Match(command);
 				var methodGroup		= match.Groups.FirstOrDefault(g => g.Name == "method");
 				var arguments		= Parser.SplitArguments(match.Groups.FirstOrDefault(g => g.Name == "arguments")?.Value);
-				var method			= Commands.consoleMethods.Where(m => m.methodName == methodGroup.Name). //Find all methods with the correct name
-					FirstOrDefault(c => ArgumentsMatch(arguments, c.argumentTypes, out object[] converted)); //Find the method overload
-				UnityEngine.Debug.Log($"Found Method: {method?.methodName ?? "NULL"}");
-				return (object o) =>
+				var method			= Commands.consoleMethods.Where(m => string.Equals(m.methodName, methodGroup.Value, StringComparison.OrdinalIgnoreCase)). //Find all methods with the correct name
+					FirstOrDefault(c => ArgumentsMatch(arguments, c.parameterTypes, out converted)); //Find the method overload
+				UnityEngine.Debug.Log($"Parsed Method: {methodGroup.Value} Arguments: {string.Join(",",arguments)} Method: {method?.ToString() ?? "NULL"}");
+				if (method != null)
 				{
-					return $"";
-				};
+					return (object o) =>
+					{
+						((MethodInfo)method).Invoke(null, converted);
+						return $"Succesfully mapped command {method}";
+					};
+				}
+				else
+				{
+					throw new BadArgumentCommandException(command);
+				}
 			}
 			throw new BadParseCommandException(command);
         }
@@ -77,9 +88,12 @@ namespace com.SolePilgrim.DevConsole
 		//TODO ensure mismatches between arguments and argumentTypes with auto-injections like DevConsole
 		private bool ArgumentsMatch(string[] arguments, Type[] argumentTypes, out object[] converted)
 		{
+			UnityEngine.Debug.Log($"Matching Arguments: ({(arguments == null ? "NONE" : string.Join(",", arguments))}) " +
+				$"to Types: ({(argumentTypes == null ? "NONE" : string.Join(",",argumentTypes.Select(t => t?.Name ?? "NOTYPE")))})");
 			converted = new object[argumentTypes.Length];
 			if (arguments.Length != argumentTypes.Length)
 			{
+				UnityEngine.Debug.Log($"Arguments {arguments.Length} and Types {argumentTypes.Length} Length Mismatch!");
 				return false;
 			}
 
@@ -88,12 +102,14 @@ namespace com.SolePilgrim.DevConsole
 				if (argumentTypes[i] == typeof(string))
 				{
 					converted[i] = arguments[i];
+					UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to string!");
 				}
 				else if (argumentTypes[i] == typeof(int))
 				{
 					if (int.TryParse(arguments[i], out int result))
 					{
 						converted[i] = result;
+						UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to int!");
 					}
 					else
 					{
@@ -102,9 +118,10 @@ namespace com.SolePilgrim.DevConsole
 				}
 				else if (argumentTypes[i] == typeof(float))
 				{
-					if (float.TryParse(arguments[i], out float result))
+					if (float.TryParse(arguments[i], NumberStyles.Float, CultureInfo.CreateSpecificCulture("en-us").NumberFormat, out float result))
 					{
 						converted[i] = result;
+						UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to float!");
 					}
 					else
 					{
@@ -115,12 +132,13 @@ namespace com.SolePilgrim.DevConsole
 				{
 					if (Mapper.IsInstanceID(arguments[i]))
 					{
-						var result = Convert.ChangeType(Mapper.GetObjectByInstanceID(arguments[i]), argumentTypes[i]);
+						var result = Mapper.GetObjectByInstanceID(arguments[i]);
 						if (result == null)
 						{
 							return false;
 						}
 						converted[i] = result;
+						UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to Mapper InstanceType {Mapper.InstanceType.FullName} Instance: {result}!");
 					}
 					else
 					{
@@ -133,6 +151,7 @@ namespace com.SolePilgrim.DevConsole
 					if (t != null)
 					{
 						converted[i] = t;
+						UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to Type!");
 					}
 					else
 					{
@@ -142,6 +161,7 @@ namespace com.SolePilgrim.DevConsole
 				else if (argumentTypes[i] == typeof(DevConsole))
 				{
 					converted[i] = this;
+					UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to DevConsole!");
 				}
 			}
 			return true;

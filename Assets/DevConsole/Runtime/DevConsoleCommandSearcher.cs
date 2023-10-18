@@ -50,30 +50,33 @@ namespace com.SolePilgrim.DevConsole
 		public string assemblyName;
 		public string typeName;
 		public string methodName;
-		public string[] argumentTypeNames;
+		public string[] parameterTypeNames;
+		[JsonIgnore]
+		public Type[] parameterTypes;
 
 
 		[JsonConstructor]
-		public SerializableConsoleMethod(string assemblyName, string typeName, string methodName, string[] argumentTypeNames)
+		public SerializableConsoleMethod(string assemblyName, string typeName, string methodName, string[] parameterTypeNames)
 		{
 			this.assemblyName		= assemblyName;
 			this.typeName			= typeName;
 			this.methodName			= methodName;
-			this.argumentTypeNames	= argumentTypeNames;
+			this.parameterTypeNames	= parameterTypeNames;
+			parameterTypes			= parameterTypeNames.Select(t => Type.GetType(t)).ToArray();
 		}
 
 		public SerializableConsoleMethod(MethodInfo methodInfo) : 
-			this(methodInfo.DeclaringType.Assembly.FullName, methodInfo.DeclaringType.FullName, methodInfo.Name, methodInfo.GetParameters().Select(p => p.ParameterType.FullName).ToArray())
+			this(methodInfo.DeclaringType.Assembly.FullName, methodInfo.DeclaringType.FullName, methodInfo.Name, methodInfo.GetParameters().Select(p => p.ParameterType.AssemblyQualifiedName).ToArray())
 		{ }
 
 		public override string ToString()
 		{
-			return $"{nameof(SerializableConsoleMethod)}:{typeName}.{methodName}({string.Join(',', argumentTypeNames)})";
+			return $"{nameof(SerializableConsoleMethod)}:{typeName}.{methodName}({string.Join(',', parameterTypeNames)})";
 		}
 
-		static public explicit operator MethodInfo(SerializableConsoleMethod macro)
+		static public explicit operator MethodInfo(SerializableConsoleMethod method)
 		{
-			return Assembly.Load(macro.assemblyName).GetType(macro.typeName).GetMethod(macro.methodName);
+			return Assembly.Load(method.assemblyName).GetType(method.typeName).GetMethod(method.methodName, method.parameterTypes);
 		}
 	}
 }
