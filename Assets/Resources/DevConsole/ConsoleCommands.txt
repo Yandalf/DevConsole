@@ -34,6 +34,32 @@
     },
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "Foo",
+      "parameterTypeNames": [
+        "System.Type, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      ]
+    },
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "Foo",
+      "parameterTypeNames": [
+        "com.SolePilgrim.DevConsole.DevConsole, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+      ]
+    },
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "Foo",
+      "parameterTypeNames": [
+        "System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+      ]
+    },
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
       "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
       "methodName": "Log",
       "parameterTypeNames": [

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
+//TODO add a way for commands to differentiate between a string and a typename. Proposal: "string" is a string, "t:string" is a typename.
 namespace com.SolePilgrim.DevConsole
 {
 	public delegate string ConsoleCommand(object commandTarget = null);
@@ -73,11 +74,16 @@ namespace com.SolePilgrim.DevConsole
 				{
 					return (object o) =>
 					{
-						((MethodInfo)method).Invoke(null, converted);
-						return $"Succesfully mapped command {method}";
+						var info = (MethodInfo)method;
+						if (info.ReturnType == typeof(string))
+						{
+							return (string)info.Invoke(null, converted);
+						}
+						info.Invoke(null, converted);
+						return $"Executed {method.methodName}";
 					};
 				}
-				else
+				else //TODO differentiate between unrecognized command and bad arguments. "Foo1" should throw unrecognized command, "Foo()" should throw bad arguments
 				{
 					throw new BadArgumentCommandException(command);
 				}
@@ -102,14 +108,12 @@ namespace com.SolePilgrim.DevConsole
 				if (argumentTypes[i] == typeof(string))
 				{
 					converted[i] = arguments[i];
-					UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to string!");
 				}
 				else if (argumentTypes[i] == typeof(int))
 				{
 					if (int.TryParse(arguments[i], out int result))
 					{
 						converted[i] = result;
-						UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to int!");
 					}
 					else
 					{
@@ -121,7 +125,6 @@ namespace com.SolePilgrim.DevConsole
 					if (float.TryParse(arguments[i], NumberStyles.Float, CultureInfo.CreateSpecificCulture("en-us").NumberFormat, out float result))
 					{
 						converted[i] = result;
-						UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to float!");
 					}
 					else
 					{
@@ -138,7 +141,6 @@ namespace com.SolePilgrim.DevConsole
 							return false;
 						}
 						converted[i] = result;
-						UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to Mapper InstanceType {Mapper.InstanceType.FullName} Instance: {result}!");
 					}
 					else
 					{

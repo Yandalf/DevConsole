@@ -11,13 +11,15 @@ namespace com.SolePilgrim.DevConsole
 		//Next a single opening bracket, and at the very end a closing bracket. Between the brackets is group 2 named arguments.
 		//Group 2 accepts any amount of \w, commas, points, and scores. Commas cannot lead or end. This prevents empty arguments. //TODO prevent doubling!
 		/// <summary>Regex pattern for C# methods.</summary>
-		static public readonly string CSharpMethodRegex = "^(?<method>[a-z_]\\w*)\\((?<arguments>(?!,)[\\w,.-]*)(?<!,)\\)$";
+		static public readonly string CSharpMethodRegex = "^(?<method>[a-z_][\\w_]*)\\((?<arguments>(?!,)[\\w,.-]*)(?<!,)\\)$";
 		/// <summary>Regex pattern for integer number (positive and negative).</summary>
 		static public readonly string IntegerRegex = "^(-?\\d+)$";
 		/// <summary>Regex pattern for decimal number (positive or negative. Use "." to denote decimals).</summary>
 		static public readonly string DecimalRegex = "^(-?\\d*\\.?\\d*)$";
 		/// <summary>Regex pattern for variable and method names.</summary>
-		static public readonly string NameRegex = "^([a-z_]\\w*)$";
+		static public readonly string NameRegex = "^([a-z_][\\w_]*)$";
+		/// <summary>Regex pattern for type arguments.</summary>
+		static public readonly string TypeRegex = "^(t:[a-z_][\\w_]*)$";
 
 
 		[ConsoleMethod]
@@ -43,6 +45,24 @@ namespace com.SolePilgrim.DevConsole
 		static public void Foo(string arg)
 		{
 
+		}
+
+		[ConsoleMethod]
+		static public void Foo(Type type)
+		{
+
+		}
+
+		[ConsoleMethod]
+		static public void Foo(DevConsole console)
+		{
+
+		}
+
+		[ConsoleMethod]
+		static public string Foo(string arg1, int arg2, float arg3)
+		{
+			return $"{arg1} {arg2} {arg3}";
 		}
 	}
 }
