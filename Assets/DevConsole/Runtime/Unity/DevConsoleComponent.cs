@@ -105,7 +105,8 @@ namespace com.SolePilgrim.DevConsole.Unity
 				{
 					DevConsole.EnterCommand(_inputLine);
 					_inputLine = string.Empty;
-					_scrollviewPosition.y = Mathf.Infinity; e.Use();
+					_scrollviewPosition.y = Mathf.Infinity;
+					e.Use();
 				}
 				else if (DevConsole.Entries.Count > 0) //Navigate previous entries
 				{
