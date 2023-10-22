@@ -9,17 +9,17 @@ namespace com.SolePilgrim.DevConsole
 		//This Regex works as follows:
 		//first symbol has to be underscore or lowercase letter, followed by any lowercase letters, numbers, or underscores (\w). This is group 1 named method.
 		//Next a single opening bracket, and at the very end a closing bracket. Between the brackets is group 2 named arguments.
-		//Group 2 accepts any amount of \w, commas, points, and scores. Commas cannot lead or end. This prevents empty arguments. //TODO prevent doubling!
+		//Group 2 accepts any amount of \w, commas, points, colons, and scores. Commas cannot lead or end and cannot be doubled, to prevent empty arguments.
 		/// <summary>Regex pattern for C# methods.</summary>
-		static public readonly string CSharpMethodRegex = "^(?<method>[a-z_][\\w_]*)\\((?<arguments>(?!,)[\\w,.-]*)(?<!,)\\)$";
+		static public readonly string CSharpMethodRegex = @"^(?<method>[a-z][\w]*)\((?<arguments>([\w-.:]+(?:,)?)*)(?<!,)\)$";
 		/// <summary>Regex pattern for integer number (positive and negative).</summary>
-		static public readonly string IntegerRegex = "^(-?\\d+)$";
+		static public readonly string IntegerRegex = @"(-?\d+)";
 		/// <summary>Regex pattern for decimal number (positive or negative. Use "." to denote decimals).</summary>
-		static public readonly string DecimalRegex = "^(-?\\d*\\.?\\d*)$";
+		static public readonly string DecimalRegex = @"(-?\d*\.?\d*)";
 		/// <summary>Regex pattern for variable and method names.</summary>
-		static public readonly string NameRegex = "^([a-z_][\\w_]*)$";
+		static public readonly string NameRegex = @"(?<!t:)([a-z][\w]*)";
 		/// <summary>Regex pattern for type arguments.</summary>
-		static public readonly string TypeRegex = "^(t:[a-z_][\\w_]*)$";
+		static public readonly string TypeRegex = @"(t:(?<type>[a-z_][\w_.]*))";
 
 
 		[ConsoleMethod]
@@ -27,6 +27,19 @@ namespace com.SolePilgrim.DevConsole
 		{
 			//Must return all Methods that can be called on an object of Type type.
 			throw new NotImplementedException();
+		}
+
+		[ConsoleMethod]
+		static public string LogInstances(DevConsole devConsole)
+		{
+			devConsole.Mapper.UpdateMapping();
+			var result		= $"Current Instances of type {devConsole.Mapper.InstanceType.Name}:";
+			var mappings	= devConsole.Mapper.GetMappings();
+			foreach (var kvp in mappings)
+			{
+				result += $"\n{kvp.Key.ToString()}-{kvp.Value.ToString()}";
+			}
+			return result;
 		}
 
 		[ConsoleMethod]
@@ -53,11 +66,11 @@ namespace com.SolePilgrim.DevConsole
 
 		}
 
-		[ConsoleMethod]
-		static public void Foo(DevConsole console)
-		{
+		//[ConsoleMethod]
+		//static public void Foo(DevConsole console)
+		//{
 
-		}
+		//}
 
 		[ConsoleMethod]
 		static public string Foo(string arg1, int arg2, float arg3)

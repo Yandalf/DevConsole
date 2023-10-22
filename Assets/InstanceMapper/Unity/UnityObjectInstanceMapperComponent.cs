@@ -5,7 +5,7 @@ using UnityEngine;
 public class UnityObjectInstanceMapperComponent : MonoBehaviour
 {
     /// <summary>Active InstanceMapper.</summary>
-    public InstanceMapper<int, Object> InstanceMapper { get; private set; }
+    public InstanceMapper<int, GameObject> InstanceMapper { get; private set; }
     /// <summary>"Seconds between automated Mapping Updates. A value below 0 disables automated updating."</summary>
     [field: SerializeField, Tooltip("Seconds between automated Mapping Updates. A value below 0 disables automated updating.")]
     public float MappingUpdatePeriod { get; private set; } = -1;
@@ -14,7 +14,7 @@ public class UnityObjectInstanceMapperComponent : MonoBehaviour
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
-        InstanceMapper = new UnityObjectInstanceMapper();
+        InstanceMapper = new GameObjectInstanceMapper();
         if(MappingUpdatePeriod >= 0)
         {
             InvokeRepeating(nameof(UpdateMapping), MappingUpdatePeriod, MappingUpdatePeriod);

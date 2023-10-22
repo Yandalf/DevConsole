@@ -1,23 +1,21 @@
 ﻿using com.SolePilgrim.Instancing;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-//TODO add a way for commands to differentiate between a string and a typename. Proposal: "string" is a string, "t:string" is a typename.
 namespace com.SolePilgrim.DevConsole
 {
 	public delegate string ConsoleCommand(object commandTarget = null);
 
 	public class DevConsole
 	{
+		public event EventHandler<Exception> OnException;
+
 		public List<DevConsoleEntry> Entries { get; private set; } = new List<DevConsoleEntry>();
 		public SerializableConsoleCommands Commands { get; private set; }
 		public DevConsoleParser Parser { get; private set; }
 		public InstanceMapper Mapper { get; private set; }
-
-		static private readonly string InvalidCommandOutput = "Unrecognized Command!";
 
 
 		public DevConsole(string serializedCommands, DevConsoleParser parser, InstanceMapper mapper)
@@ -29,7 +27,16 @@ namespace com.SolePilgrim.DevConsole
 
 		public void EnterCommand(string input)
 		{
-			var output = ProcessInput(input);
+			string output;
+			try
+			{
+				output = ParseCommand(input).Invoke();
+			}
+			catch (Exception e)
+			{
+				output = e.Message + (e is CommandException ? string.Empty : $"\n{e.StackTrace}");
+				OnException?.Invoke(this, e);
+			}
 			Entries.Add(new DevConsoleEntry(input, output));
 		}
 
@@ -38,38 +45,28 @@ namespace com.SolePilgrim.DevConsole
 			Entries.Clear();
 		}
 
-		private string ProcessInput(string input)
-		{
-            try
-            {
-				return ParseCommand(input).Invoke();
-			}
-			catch(Exception e)
-            {
-				return e.Message + (e is CommandException ? string.Empty : $"\n{e.StackTrace}");
-			}
-		}
-
 		private ConsoleCommand ParseCommand(string command)
         {
-			if (Parser.instanceIDRegex.IsMatch(command))
+			if (Mapper.IsInstanceID(command, out string instanceID))
             {
 				return (object o) => 
 				{
-					var result = Mapper.GetObjectByInstanceID(command);
-					var s = $"{command}-{result}";
+					var result = Mapper.GetObjectByInstanceID(instanceID);
+					var s = $"{instanceID}-{result}";
 					return s;
 				};
             }
 			else if (Parser.methodRegex.IsMatch(command))
 			{
-				var converted		= new object[0];
-				var match			= Parser.methodRegex.Match(command);
-				var methodGroup		= match.Groups.FirstOrDefault(g => g.Name == "method");
-				var arguments		= Parser.SplitArguments(match.Groups.FirstOrDefault(g => g.Name == "arguments")?.Value);
-				var method			= Commands.consoleMethods.Where(m => string.Equals(m.methodName, methodGroup.Value, StringComparison.OrdinalIgnoreCase)). //Find all methods with the correct name
-					FirstOrDefault(c => ArgumentsMatch(arguments, c.parameterTypes, out converted)); //Find the method overload
-				UnityEngine.Debug.Log($"Parsed Method: {methodGroup.Value} Arguments: {string.Join(",",arguments)} Method: {method?.ToString() ?? "NULL"}");
+				Parser.GetMethodAndArguments(command, out string methodName, out string[] arguments);
+				var methods	= Commands.consoleMethods.Where(m => string.Equals(m.methodName, methodName, StringComparison.OrdinalIgnoreCase)); //Find all methods with the correct name
+				if (methods == null || methods.Count() == 0)
+				{
+					throw new BadParseCommandException(command);
+				}
+				var converted	= new object[0];
+				var method		= methods.FirstOrDefault(c => ArgumentsMatch(arguments, c.parameterTypes, out converted)); //Find the method overload
+				UnityEngine.Debug.Log($"Parsed Method: {methodName} Arguments: {string.Join(",",arguments)} Method: {method?.ToString() ?? "NULL"}");
 				if (method != null)
 				{
 					return (object o) =>
@@ -83,15 +80,16 @@ namespace com.SolePilgrim.DevConsole
 						return $"Executed {method.methodName}";
 					};
 				}
-				else //TODO differentiate between unrecognized command and bad arguments. "Foo1" should throw unrecognized command, "Foo()" should throw bad arguments
+				else
 				{
-					throw new BadArgumentCommandException(command);
+					throw new BadArgumentCommandException(string.Join("\n",methods.Select(m => $"-{m.ToPrettyString()}")));
 				}
 			}
 			throw new BadParseCommandException(command);
         }
 
 		//TODO ensure mismatches between arguments and argumentTypes with auto-injections like DevConsole
+		//Empty arguments now get mapped to DevConsole if no other overloads work either: dosomething() when only dosomething(devconsole) exists returns a match. This needs to be fixed.
 		private bool ArgumentsMatch(string[] arguments, Type[] argumentTypes, out object[] converted)
 		{
 			UnityEngine.Debug.Log($"Matching Arguments: ({(arguments == null ? "NONE" : string.Join(",", arguments))}) " +
@@ -107,7 +105,14 @@ namespace com.SolePilgrim.DevConsole
 			{
 				if (argumentTypes[i] == typeof(string))
 				{
-					converted[i] = arguments[i];
+					if (Parser.IsName(arguments[i]))
+					{
+						converted[i] = arguments[i];
+					}
+					else
+					{
+						return false;
+					}
 				}
 				else if (argumentTypes[i] == typeof(int))
 				{
@@ -122,7 +127,7 @@ namespace com.SolePilgrim.DevConsole
 				}
 				else if (argumentTypes[i] == typeof(float))
 				{
-					if (float.TryParse(arguments[i], NumberStyles.Float, CultureInfo.CreateSpecificCulture("en-us").NumberFormat, out float result))
+					if (Parser.ParseFloat(arguments[i], out float result))
 					{
 						converted[i] = result;
 					}
@@ -133,24 +138,19 @@ namespace com.SolePilgrim.DevConsole
 				}
 				else if (Mapper.InstanceType.IsAssignableFrom(argumentTypes[i]))
 				{
-					if (Mapper.IsInstanceID(arguments[i]))
+					if (Mapper.GetObjectByInstanceID(arguments[i], out object result))
 					{
-						var result = Mapper.GetObjectByInstanceID(arguments[i]);
-						if (result == null)
-						{
-							return false;
-						}
 						converted[i] = result;
 					}
 					else
 					{
 						return false;
 					}
+					UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to InstanceID! Result: {result?.ToString()??"NULL"}");
 				}
-				else if (argumentTypes[i] == typeof(Type))
+				if (argumentTypes[i] == typeof(Type))
 				{
-					var t = Type.GetType(arguments[i], false, true);
-					if (t != null)
+					if (Parser.ParseType(arguments[i], true, out var t))
 					{
 						converted[i] = t;
 						UnityEngine.Debug.Log($"Mapped argument {arguments[i]} to Type!");
@@ -182,6 +182,6 @@ namespace com.SolePilgrim.DevConsole
 
 	public class BadArgumentCommandException : CommandException
 	{
-		public BadArgumentCommandException(string command) : base($"Invalid DevConsoleCommand Arguments") { }
+		public BadArgumentCommandException(string commands) : base($"Invalid Argument(s) for DevConsoleCommand:\n{commands}") { }
 	}
 }

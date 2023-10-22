@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Events;
@@ -36,10 +37,12 @@ namespace com.SolePilgrim.DevConsole.Unity
 
 		private void Awake()
 		{
-			var instanceIDRegex = new Regex(DevConsoleUtilities.IntegerRegex);
 			var methodRegex		= new Regex(DevConsoleUtilities.CSharpMethodRegex, RegexOptions.IgnoreCase);
-			var parser = new DevConsoleParser(instanceIDRegex, methodRegex, ',');
+			var typeRegex		= new Regex($"^{DevConsoleUtilities.TypeRegex}$", RegexOptions.IgnoreCase);
+			var nameRegex		= new Regex($"^{DevConsoleUtilities.NameRegex}$", RegexOptions.IgnoreCase);
+			var parser = new DevConsoleParser(methodRegex, typeRegex, nameRegex, ',');
 			DevConsole = new DevConsole(_consoleCommandsFile.text, parser, InstanceMapper.InstanceMapper);
+			DevConsole.OnException += OnException;
 		}
 
 		private void Update()
@@ -98,10 +101,11 @@ namespace com.SolePilgrim.DevConsole.Unity
 					ToggleConsole();
 					e.Use();
 				}
-				else if (e.keyCode == KeyCode.Return && !string.IsNullOrEmpty(_inputLine)) //Event handling before input, else it won't work. Weird.
+				else if (e.keyCode == KeyCode.Return && !string.IsNullOrEmpty(_inputLine)) //Handle command sending before any other input.
 				{
-					HandleCommandInput(_inputLine);
-					e.Use();
+					DevConsole.EnterCommand(_inputLine);
+					_inputLine = string.Empty;
+					_scrollviewPosition.y = Mathf.Infinity; e.Use();
 				}
 				else if (DevConsole.Entries.Count > 0) //Navigate previous entries
 				{
@@ -132,17 +136,15 @@ namespace com.SolePilgrim.DevConsole.Unity
 			GUI.DragWindow();
 		}
 
-		private void HandleCommandInput(string input)
-		{
-			DevConsole.EnterCommand(input);
-			_inputLine = string.Empty;
-			_scrollviewPosition.y = Mathf.Infinity;
-		}
-
 		private void ToggleConsole()
 		{
 			ConsoleActive = !ConsoleActive;
 			OnConsoleToggled?.Invoke(ConsoleActive);
+		}
+
+		private void OnException(object sender, Exception e)
+		{
+			Debug.LogError(e, this);
 		}
 	}
 }

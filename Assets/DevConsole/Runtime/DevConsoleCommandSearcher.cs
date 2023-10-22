@@ -69,6 +69,11 @@ namespace com.SolePilgrim.DevConsole
 			this(methodInfo.DeclaringType.Assembly.FullName, methodInfo.DeclaringType.FullName, methodInfo.Name, methodInfo.GetParameters().Select(p => p.ParameterType.AssemblyQualifiedName).ToArray())
 		{ }
 
+		public string ToPrettyString()
+		{
+			return $"{methodName}({string.Join(',', parameterTypes.Select(t => t.Name))})";
+		}
+
 		public override string ToString()
 		{
 			return $"{nameof(SerializableConsoleMethod)}:{typeName}.{methodName}({string.Join(',', parameterTypeNames)})";

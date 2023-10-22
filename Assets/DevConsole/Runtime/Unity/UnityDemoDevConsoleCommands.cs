@@ -9,5 +9,11 @@ namespace com.SolePilgrim.DevConsole.Unity
         {
             return GameObject.FindWithTag("player");
         }
+
+		[ConsoleMethod]
+		static public void Foo(GameObject obj)
+		{
+
+		}
     }
 }
