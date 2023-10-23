@@ -6,10 +6,9 @@ using System.Reflection;
 
 namespace com.SolePilgrim.DevConsole
 {
-	public delegate string ConsoleCommand();
-
 	public class DevConsole
 	{
+		public delegate string ConsoleCommand();
 		public event EventHandler<Exception> OnException;
 
 		public List<DevConsoleEntry> Entries { get; private set; } = new List<DevConsoleEntry>();
@@ -166,20 +165,5 @@ namespace com.SolePilgrim.DevConsole
 				return $"Executed {method.Name}";
 			};
 		}
-	}
-
-	abstract public class CommandException : Exception
-	{
-		public CommandException(string message) : base(message) { }
-	}
-
-	public class BadParseCommandException : CommandException
-	{
-		public BadParseCommandException(string command) : base($"Unrecognized DevConsoleCommand:{command}") { }
-	}
-
-	public class BadArgumentCommandException : CommandException
-	{
-		public BadArgumentCommandException(string commands) : base($"Invalid Argument(s) for DevConsoleCommand:\n{commands}") { }
 	}
 }
