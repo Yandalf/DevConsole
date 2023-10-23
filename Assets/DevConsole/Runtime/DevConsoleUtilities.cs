@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 
 namespace com.SolePilgrim.DevConsole
@@ -12,7 +13,7 @@ namespace com.SolePilgrim.DevConsole
 		//Group 2 accepts any amount of \w, commas, points, colons, and scores. Commas cannot lead or end and cannot be doubled, to prevent empty arguments.
 		/// <summary>Regex pattern for C# methods.</summary>
 		static public readonly string CSharpMethodRegex = @"^(?<method>[a-z][\w]*)\((?<arguments>([\w-.:]+(?:,)?)*)(?<!,)\)$";
-		/// <summary>Regex pattern for integer number (positive and negative).</summary>
+		/// <summary>Regex pattern for integer number (positive or negative).</summary>
 		static public readonly string IntegerRegex = @"(-?\d+)";
 		/// <summary>Regex pattern for decimal number (positive or negative. Use "." to denote decimals).</summary>
 		static public readonly string DecimalRegex = @"(-?\d*\.?\d*)";
@@ -22,14 +23,7 @@ namespace com.SolePilgrim.DevConsole
 		static public readonly string TypeRegex = @"(t:(?<type>[a-z_][\w_.]*))";
 
 
-		[ConsoleMethod]
-		static public MethodInfo[] GetValidMethods(Type type)
-		{
-			//Must return all Methods that can be called on an object of Type type.
-			throw new NotImplementedException();
-		}
-
-		[ConsoleMethod]
+		[ConsoleMacro]
 		static public string LogInstances(DevConsole devConsole)
 		{
 			devConsole.Mapper.UpdateMapping();
@@ -42,40 +36,47 @@ namespace com.SolePilgrim.DevConsole
 			return result;
 		}
 
-		[ConsoleMethod]
-		static public void Foo(int arg)
+		[ConsoleMacro]
+		static public string Help(DevConsole devConsole)
 		{
-
+			return $"Methods:\n{string.Join("\n", devConsole.Commands.consoleMethods.OrderBy(m => m.methodName).Select(m => $" -{m.ToPrettyString()}"))}" +
+				$"\nMacros:\n{string.Join("\n", devConsole.Commands.consoleMacros.OrderBy(m => m.methodName).Select(m => $" -{m.ToPrettyString()}"))}";
 		}
 
 		[ConsoleMethod]
-		static public void Foo(float arg)
+		static public string Foo()
 		{
-
+			return $"Foo()";
 		}
 
 		[ConsoleMethod]
-		static public void Foo(string arg)
+		static public string Foo(int arg)
 		{
-
+			return $"Foo int:{arg}";
 		}
 
 		[ConsoleMethod]
-		static public void Foo(Type type)
+		static public string Foo(float arg)
 		{
-
+			return $"Foo float:{arg}";
 		}
 
-		//[ConsoleMethod]
-		//static public void Foo(DevConsole console)
-		//{
+		[ConsoleMethod]
+		static public string Foo(string arg)
+		{
+			return $"Foo string:{arg}";
+		}
 
-		//}
+		[ConsoleMethod]
+		static public string Foo(Type type)
+		{
+			return $"Foo type:{type.Name}";
+		}
 
 		[ConsoleMethod]
 		static public string Foo(string arg1, int arg2, float arg3)
 		{
-			return $"{arg1} {arg2} {arg3}";
+			return $"foo string int float:{arg1} {arg2} {arg3}";
 		}
 	}
 }

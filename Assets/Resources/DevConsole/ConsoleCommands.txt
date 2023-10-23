@@ -3,18 +3,8 @@
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
       "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
-      "methodName": "GetValidMethods",
-      "parameterTypeNames": [
-        "System.Type, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-      ]
-    },
-    {
-      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
-      "methodName": "LogInstances",
-      "parameterTypeNames": [
-        "com.SolePilgrim.DevConsole.DevConsole, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
-      ]
+      "methodName": "Foo",
+      "parameterTypeNames": []
     },
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -76,16 +66,34 @@
     },
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-      "typeName": "com.SolePilgrim.DevConsole.Unity.UnityDemoDevConsoleCommands",
+      "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
       "methodName": "GetPlayer",
       "parameterTypeNames": []
     },
     {
       "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-      "typeName": "com.SolePilgrim.DevConsole.Unity.UnityDemoDevConsoleCommands",
+      "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
       "methodName": "Foo",
       "parameterTypeNames": [
         "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+      ]
+    }
+  ],
+  "consoleMacros": [
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "LogInstances",
+      "parameterTypeNames": [
+        "com.SolePilgrim.DevConsole.DevConsole, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+      ]
+    },
+    {
+      "assemblyName": "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+      "typeName": "com.SolePilgrim.DevConsole.DevConsoleUtilities",
+      "methodName": "Help",
+      "parameterTypeNames": [
+        "com.SolePilgrim.DevConsole.DevConsole, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
       ]
     }
   ]

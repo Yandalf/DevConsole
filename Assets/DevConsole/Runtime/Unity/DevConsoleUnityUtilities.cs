@@ -19,5 +19,17 @@ namespace com.SolePilgrim.DevConsole.Unity
 			var components = obj.GetComponents<Component>();
 			Debug.Log($"{obj}:\n{string.Join("\n-", components.Select(c => c.GetType().FullName))}");
 		}
+
+		[ConsoleMethod]
+		static public GameObject GetPlayer()
+		{
+			return GameObject.FindWithTag("player");
+		}
+
+		[ConsoleMethod]
+		static public string Foo(GameObject obj)
+		{
+			return $"foo gameobject:{obj}";
+		}
 	}
 }

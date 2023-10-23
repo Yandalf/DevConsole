@@ -8,16 +8,17 @@ namespace com.SolePilgrim.DevConsole
 {
 	static public class DevConsoleCommandSearcher
 	{
-		static public void FindAllConsoleCommands(out IEnumerable<MethodInfo> methods)
+		static public void FindAllConsoleCommands(out IEnumerable<MethodInfo> methods, out IEnumerable<MethodInfo> macros)
 		{
 			var allTypes	= AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes());
 			var allMethods	= allTypes.SelectMany(t => t.GetMethods());
 			methods = allMethods.Where(m => m.CustomAttributes.Count(d => d.AttributeType == typeof(ConsoleMethodAttribute)) > 0); //Finds all methods in the project marked with ConsoleMethodAttribute
+			macros	= allMethods.Where(m => m.CustomAttributes.Count(d => d.AttributeType == typeof(ConsoleMacroAttribute)) > 0); //Finds all methods in the project marked with ConsoleMacroAttribute
 		}
 
-		static public string ConsoleCommandsToString(IEnumerable<MethodInfo> methods, Formatting formatting = Formatting.None)
+		static public string ConsoleCommandsToString(IEnumerable<MethodInfo> methods, IEnumerable<MethodInfo> macros, Formatting formatting = Formatting.None)
         {
-			var allCommands = new SerializableConsoleCommands(methods);
+			var allCommands = new SerializableConsoleCommands(methods, macros);
 			return JsonConvert.SerializeObject(allCommands, formatting);
         }
 
@@ -30,18 +31,21 @@ namespace com.SolePilgrim.DevConsole
 	public class SerializableConsoleCommands
     {
 		public SerializableConsoleMethod[] consoleMethods;
+		public SerializableConsoleMethod[] consoleMacros;
 
 		[JsonConstructor]
 		public SerializableConsoleCommands() { }
-		public SerializableConsoleCommands(IEnumerable<MethodInfo> methods)
+		public SerializableConsoleCommands(IEnumerable<MethodInfo> methods, IEnumerable<MethodInfo> macros)
         {
 			consoleMethods = methods.Select(m => new SerializableConsoleMethod(m)).ToArray();
+			consoleMacros  = macros.Select(m => new SerializableConsoleMethod(m)).ToArray();
         }
 
 		public override string ToString()
 		{
-			return base.ToString() + 
-				$"ConsoleMethods:\n{string.Join("\n",consoleMethods.Select(m => $"-{m.ToString()}"))}";
+			return base.ToString() +
+				$"ConsoleMethods:\n{string.Join("\n", consoleMethods.Select(m => $"-{m.ToString()}"))}" +
+				$"\nConsoleMacros:\n{string.Join("\n", consoleMacros.Select(m => $"-{m.ToString()}"))}";
 		}
 	}
 
