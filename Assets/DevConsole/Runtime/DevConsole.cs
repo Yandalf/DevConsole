@@ -6,6 +6,7 @@ using System.Reflection;
 
 namespace com.SolePilgrim.DevConsole
 {
+	//TODO allow for multiple mappers to be used at once. This way users can more granularly identify different types of ObjectInstances.
 	public class DevConsole
 	{
 		public delegate string ConsoleCommand();
