@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace com.SolePilgrim.DevConsole.Unity
 {
@@ -8,22 +7,25 @@ namespace com.SolePilgrim.DevConsole.Unity
 	static public class DevConsoleUnityUtilities
 	{
 		[ConsoleMethod]
-		static public void Log(Object obj)
+		static public string Log(GameObject obj)
 		{
 			Debug.Log(obj);
+			return obj.ToString();
 		}
 
 		[ConsoleMethod]
-		static public void LogComponents(GameObject obj)
+		static public string LogComponents(GameObject obj)
 		{
 			var components = obj.GetComponents<Component>();
-			Debug.Log($"{obj}:\n{string.Join("\n-", components.Select(c => c.GetType().FullName))}");
+			var str = $"{obj}:\n{string.Join("\n", components.Select(c => $"-{c.GetType().FullName}"))}";
+			Debug.Log(str);
+			return str;
 		}
 
 		[ConsoleMethod]
 		static public GameObject GetPlayer()
 		{
-			return GameObject.FindWithTag("player");
+			return GameObject.FindWithTag("Player");
 		}
 
 		[ConsoleMethod]

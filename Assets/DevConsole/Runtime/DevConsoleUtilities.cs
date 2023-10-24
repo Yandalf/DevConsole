@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 
 namespace com.SolePilgrim.DevConsole
 {
@@ -26,12 +25,20 @@ namespace com.SolePilgrim.DevConsole
 		[ConsoleMacro]
 		static public string LogInstances(DevConsole devConsole)
 		{
-			devConsole.Mapper.UpdateMapping();
-			var result		= $"Current Instances of type {devConsole.Mapper.InstanceType.Name}:";
-			var mappings	= devConsole.Mapper.GetMappings();
-			foreach (var kvp in mappings)
+			var result = string.Empty;
+			foreach (var mapper in devConsole.InstanceMappers)
 			{
-				result += $"\n{kvp.Key.ToString()}-{kvp.Value.ToString()}";
+				mapper.UpdateMapping();
+				result += $"Current Instances of type {mapper.InstanceType.Name}:";
+				var mappings = mapper.GetMappings();
+				foreach (var kvp in mappings)
+				{
+					result += $"\n{kvp.Key.ToString()}-{kvp.Value.ToString()}";
+				}
+				if (devConsole.InstanceMappers.Last() != mapper)
+				{
+					result += "\n";
+				}
 			}
 			return result;
 		}

@@ -2,17 +2,17 @@
 
 namespace com.SolePilgrim.DevConsole
 {
-	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field)]
-	public class ConsoleVariableAttribute : Attribute
-    {
-		public string VariableName { get; private set; }
-
-
-		public ConsoleVariableAttribute(string variableName)
-        {
-			VariableName = variableName;
-        }
-    }
+	//[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field)]
+	//public class ConsoleVariableAttribute : Attribute
+    //{
+	//	public string VariableName { get; private set; }
+	//
+	//
+	//	public ConsoleVariableAttribute(string variableName)
+    //    {
+	//		VariableName = variableName;
+    //    }
+    //}
 
 	/// <summary>Attribute to mark static methods as callable through DevConsole. 
 	/// Marked method can have arguments of types int, float, string, Type, and InstanceType of the Console's InstanceMapper.</summary>

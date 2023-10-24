@@ -21,7 +21,7 @@ namespace com.SolePilgrim.DevConsole
 
 		public string[] SplitArguments(string argumentsString)
 		{
-			return argumentsString.Split(argumentSeparator);
+			return argumentsString.Split(argumentSeparator, StringSplitOptions.RemoveEmptyEntries);
 		}
 
 		public bool IsName(string argument)
@@ -34,9 +34,15 @@ namespace com.SolePilgrim.DevConsole
 			return float.TryParse(argument, NumberStyles.Float, CultureInfo.CreateSpecificCulture("en-us").NumberFormat, out result);
 		}
 
-		public bool ParseType(string argument, bool ignoreCase, out Type type)
+		public bool ParseType(string argument, bool throwOnError, bool ignoreCase, out Type type)
 		{
-			type = Type.GetType(typeRegex.Match(argument)?.Groups["type"].Value, false, ignoreCase);
+			var match = typeRegex.Match(argument)?.Groups["type"];
+			if (string.IsNullOrEmpty(match.Value))
+			{
+				type = null;
+				return false;
+			}
+			type = Type.GetType(match.Value, throwOnError, ignoreCase);
 			return type != null;
 		}
 

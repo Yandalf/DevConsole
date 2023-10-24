@@ -6,23 +6,24 @@ using System.Reflection;
 
 namespace com.SolePilgrim.DevConsole
 {
-	//TODO allow for multiple mappers to be used at once. This way users can more granularly identify different types of ObjectInstances.
 	public class DevConsole
 	{
 		public delegate string ConsoleCommand();
 		public event EventHandler<Exception> OnException;
 
-		public List<DevConsoleEntry> Entries { get; private set; } = new List<DevConsoleEntry>();
-		public SerializableConsoleCommands Commands { get; private set; }
-		public DevConsoleParser Parser { get; private set; }
-		public InstanceMapper Mapper { get; private set; }
+		public List<DevConsoleEntry> Entries				{ get; private set; } = new List<DevConsoleEntry>();
+		public SerializableConsoleCommands Commands			{ get; private set; }
+		public DevConsoleParser Parser						{ get; private set; }
+		public InstanceMapper[] InstanceMappers				{ get; private set; }
+		public DevConsoleArgumentMatcher[] ArgumentMatchers { get; private set; }
 
 
-		public DevConsole(string serializedCommands, DevConsoleParser parser, InstanceMapper mapper)
+		public DevConsole(string serializedCommands, DevConsoleParser parser, InstanceMapper[] mappers, DevConsoleArgumentMatcher[] matchers)
 		{
-			Parser		= parser;
-			Commands	= DevConsoleCommandSearcher.StringToConsoleCommands(serializedCommands);
-			Mapper		= mapper;
+			Parser				= parser;
+			Commands			= DevConsoleCommandSearcher.StringToConsoleCommands(serializedCommands);
+			InstanceMappers		= mappers;
+			ArgumentMatchers	= matchers;
 		}
 
 		public void EnterCommand(string input)
@@ -45,14 +46,15 @@ namespace com.SolePilgrim.DevConsole
 			Entries.Clear();
 		}
 
-		//TODO Foo() throws exception in execution now! 
 		private ConsoleCommand ParseCommand(string command)
         {
-			if (Mapper.IsInstanceID(command, out string instanceID))
+			var instanceID		= string.Empty;
+			var matchingMapper	= InstanceMappers.FirstOrDefault(m => m.IsInstanceID(command, out instanceID));
+			if (matchingMapper != null)
             {
 				return () => 
 				{
-					var result = Mapper.GetObjectByInstanceID(instanceID);
+					var result = matchingMapper.GetObjectByInstanceID(instanceID);
 					var s = $"{instanceID}-{result}";
 					return s;
 				};
@@ -95,59 +97,16 @@ namespace com.SolePilgrim.DevConsole
 
 			for (int i = 0; i < arguments.Length && i < argumentTypes.Length; i++)
 			{
-				if (argumentTypes[i] == typeof(string))
+				for (int j = 0; j < ArgumentMatchers.Length; j++)
 				{
-					if (Parser.IsName(arguments[i]))
+					var matched = ArgumentMatchers[j].TryConvertArgument(arguments[i], argumentTypes[i], this, out converted[i]);
+					if (matched)
 					{
-						converted[i] = arguments[i];
+						break;
 					}
-					else
+					else if (j == ArgumentMatchers.Length - 1)
 					{
-						return false;
-					}
-				}
-				else if (argumentTypes[i] == typeof(int))
-				{
-					if (int.TryParse(arguments[i], out int result))
-					{
-						converted[i] = result;
-					}
-					else
-					{
-						return false;
-					}
-				}
-				else if (argumentTypes[i] == typeof(float))
-				{
-					if (Parser.ParseFloat(arguments[i], out float result))
-					{
-						converted[i] = result;
-					}
-					else
-					{
-						return false;
-					}
-				}
-				else if (Mapper.InstanceType.IsAssignableFrom(argumentTypes[i]))
-				{
-					if (Mapper.GetObjectByInstanceID(arguments[i], out object result))
-					{
-						converted[i] = result;
-					}
-					else
-					{
-						return false;
-					}
-				}
-				else if (argumentTypes[i] == typeof(Type))
-				{
-					if (Parser.ParseType(arguments[i], true, out var t))
-					{
-						converted[i] = t;
-					}
-					else
-					{
-						return false;
+						return false; //Return false as soon as we can't match a single argument
 					}
 				}
 			}

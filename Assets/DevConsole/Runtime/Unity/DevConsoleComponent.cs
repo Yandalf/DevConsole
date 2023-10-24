@@ -1,3 +1,4 @@
+using com.SolePilgrim.Instancing;
 using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -40,9 +41,22 @@ namespace com.SolePilgrim.DevConsole.Unity
 			var methodRegex		= new Regex(DevConsoleUtilities.CSharpMethodRegex, RegexOptions.IgnoreCase);
 			var typeRegex		= new Regex($"^{DevConsoleUtilities.TypeRegex}$", RegexOptions.IgnoreCase);
 			var nameRegex		= new Regex($"^{DevConsoleUtilities.NameRegex}$", RegexOptions.IgnoreCase);
-			var parser = new DevConsoleParser(methodRegex, typeRegex, nameRegex, ',');
-			DevConsole = new DevConsole(_consoleCommandsFile.text, parser, InstanceMapper.InstanceMapper);
+			var parser			= new DevConsoleParser(methodRegex, typeRegex, nameRegex, ',');
+			var mappers			= new InstanceMapper[]
+			{
+				InstanceMapper.InstanceMapper
+			};
+			var matchers		= new DevConsoleArgumentMatcher[]
+			{
+				new IntMatcher(),
+				new FloatMatcher(),
+				new TypeMatcher(),
+				new InstanceMatcher(),
+				new StringMatcher() //Put StringMatcher last as it's the least specific
+			};
+			DevConsole = new DevConsole(_consoleCommandsFile.text, parser, mappers, matchers);
 			DevConsole.OnException += OnException;
+			DevConsole.Entries.Add(new DevConsoleEntry("Type \"help()\" for a list of available commands.", string.Empty));
 		}
 
 		private void Update()

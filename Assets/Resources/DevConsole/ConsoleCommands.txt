@@ -53,7 +53,7 @@
       "typeName": "com.SolePilgrim.DevConsole.Unity.DevConsoleUnityUtilities",
       "methodName": "Log",
       "parameterTypeNames": [
-        "UnityEngine.Object, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
       ]
     },
     {
