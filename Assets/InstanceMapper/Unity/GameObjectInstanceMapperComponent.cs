@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace com.SolePilgrim.Instancing.Unity
 {
-
 	[DisallowMultipleComponent, AddComponentMenu("SolePilgrim/InstanceMapper/GameObjectInstanceMapper Component")]
     /// <summary>InstanceMapperComponent for GameObjects.</summary>
     public class GameObjectInstanceMapperComponent : InstanceMapperComponent
