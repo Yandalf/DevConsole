@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace com.SolePilgrim.Instancing
+namespace com.SolePilgrim.Instancing.Unity
 {
 	/// <summary>GameObject implementation of InstanceMapper.</summary>
 	public class GameObjectInstanceMapper : InstanceMapper<int, GameObject>

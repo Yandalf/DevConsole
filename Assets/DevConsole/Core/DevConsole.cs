@@ -15,13 +15,13 @@ namespace com.SolePilgrim.DevConsole
 		public SerializableConsoleCommands Commands			{ get; private set; }
 		public DevConsoleParser Parser						{ get; private set; }
 		public InstanceMapper[] InstanceMappers				{ get; private set; }
-		public DevConsoleArgumentMatcher[] ArgumentMatchers { get; private set; }
+		public ArgumentMatcher[] ArgumentMatchers { get; private set; }
 
 
-		public DevConsole(string serializedCommands, DevConsoleParser parser, InstanceMapper[] mappers, DevConsoleArgumentMatcher[] matchers)
+		public DevConsole(string serializedCommands, DevConsoleParser parser, InstanceMapper[] mappers, ArgumentMatcher[] matchers)
 		{
 			Parser				= parser;
-			Commands			= DevConsoleCommandSearcher.StringToConsoleCommands(serializedCommands);
+			Commands			= CommandSearcher.StringToConsoleCommands(serializedCommands);
 			InstanceMappers		= mappers;
 			ArgumentMatchers	= matchers;
 		}
@@ -81,7 +81,7 @@ namespace com.SolePilgrim.DevConsole
 				}
 				else
 				{
-					throw new BadArgumentCommandException(string.Join("\n",methods.Select(m => $"-{m.ToPrettyString()}").Concat(macros.Select(m => $"-{m.ToPrettyString()}"))));
+					throw new BadArgumentCommandException(string.Join("\n",methods.Select(m => $"-{m.ToString(true)}").Concat(macros.Select(m => $"-{m.ToString(true)}"))));
 				}
 			}
 			throw new BadParseCommandException(command);

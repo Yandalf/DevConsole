@@ -327,7 +327,6 @@ GameObject:
   m_Component:
   - component: {fileID: 299045595}
   - component: {fileID: 299045594}
-  - component: {fileID: 299045593}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -335,14 +334,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &299045593
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 299045592}
-  m_Enabled: 1
 --- !u!20 &299045594
 Camera:
   m_ObjectHideFlags: 0
@@ -412,7 +403,7 @@ GameObject:
   - component: {fileID: 321971892}
   - component: {fileID: 321971891}
   m_Layer: 0
-  m_Name: ObjectInstanceMapper
+  m_Name: GameObjectInstanceMapper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -430,7 +421,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4701b277782ef74cb6cd954cea2d8e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <MappingUpdatePeriod>k__BackingField: -1
+  <MappingUpdatePeriod>k__BackingField: 0
 --- !u!4 &321971892
 Transform:
   m_ObjectHideFlags: 0
@@ -478,7 +469,8 @@ MonoBehaviour:
   <OnConsoleToggled>k__BackingField:
     m_PersistentCalls:
       m_Calls: []
-  <InstanceMapper>k__BackingField: {fileID: 321971891}
+  <InstanceMappers>k__BackingField:
+  - {fileID: 321971891}
   _toggleConsoleKey: 282
   _consoleCommandsFile: {fileID: 4900000, guid: 8f27a8312427758489737de107e0ad1b, type: 3}
 --- !u!4 &1377669966

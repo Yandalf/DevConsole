@@ -1,5 +1,6 @@
-using com.SolePilgrim.Instancing;
+using com.SolePilgrim.Instancing.Unity;
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,7 +18,7 @@ namespace com.SolePilgrim.DevConsole.Unity
 		[field: SerializeField]
 		public UnityEvent<bool> OnConsoleToggled { get; private set; }
 		[field: SerializeField]
-		public UnityObjectInstanceMapperComponent InstanceMapper { get; private set; }
+		public InstanceMapperComponent[] InstanceMappers { get; private set; }
 
 		[SerializeField, Tooltip("Keyboard key used to toggle the console.")]
 		private KeyCode _toggleConsoleKey = KeyCode.Tilde;
@@ -42,11 +43,8 @@ namespace com.SolePilgrim.DevConsole.Unity
 			var typeRegex		= new Regex($"^{DevConsoleUtilities.TypeRegex}$", RegexOptions.IgnoreCase);
 			var nameRegex		= new Regex($"^{DevConsoleUtilities.NameRegex}$", RegexOptions.IgnoreCase);
 			var parser			= new DevConsoleParser(methodRegex, typeRegex, nameRegex, ',');
-			var mappers			= new InstanceMapper[]
-			{
-				InstanceMapper.InstanceMapper
-			};
-			var matchers		= new DevConsoleArgumentMatcher[]
+			var mappers			= InstanceMappers.Select(m => m.InstanceMapper).ToArray();
+			var matchers		= new ArgumentMatcher[]
 			{
 				new IntMatcher(),
 				new FloatMatcher(),

@@ -46,8 +46,8 @@ namespace com.SolePilgrim.DevConsole
 		[ConsoleMacro]
 		static public string Help(DevConsole devConsole)
 		{
-			return $"Methods:\n{string.Join("\n", devConsole.Commands.consoleMethods.OrderBy(m => m.methodName).Select(m => $" -{m.ToPrettyString()}"))}" +
-				$"\nMacros:\n{string.Join("\n", devConsole.Commands.consoleMacros.OrderBy(m => m.methodName).Select(m => $" -{m.ToPrettyString()}"))}";
+			return $"Methods:\n{string.Join("\n", devConsole.Commands.consoleMethods.OrderBy(m => m.methodName).Select(m => $" -{m.ToString(true)}"))}" +
+				$"\nMacros:\n{string.Join("\n", devConsole.Commands.consoleMacros.OrderBy(m => m.methodName).Select(m => $" -{m.ToString(true)}"))}";
 		}
 
 		[ConsoleMethod]

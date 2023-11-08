@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace com.SolePilgrim.Instancing
+namespace com.SolePilgrim.Instancing.Unity
 {
 	/// <summary>Unity implementation of InstanceMapper.</summary>
 	public class UnityObjectInstanceMapper : InstanceMapper<int, Object>

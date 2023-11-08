@@ -4,7 +4,7 @@ using System.Linq;
 namespace com.SolePilgrim.DevConsole
 {
 	/// <summary>Rules to convert a string argument.</summary>
-	abstract public class DevConsoleArgumentMatcher
+	abstract public class ArgumentMatcher
 	{
 		/// <summary>Attempts to convert a string argument.</summary>
 		/// <param name="argument">String to convert.</param>
@@ -16,7 +16,7 @@ namespace com.SolePilgrim.DevConsole
 	}
 
 	/// <summary>Converts arguments to int objects.</summary>
-	public class IntMatcher : DevConsoleArgumentMatcher
+	public class IntMatcher : ArgumentMatcher
 	{
 		public override bool TryConvertArgument(string argument, Type argumentType, DevConsole devConsole, out object converted)
 		{
@@ -32,7 +32,7 @@ namespace com.SolePilgrim.DevConsole
 	}
 
 	/// <summary>Converts arguments to float objects.</summary>
-	public class FloatMatcher : DevConsoleArgumentMatcher
+	public class FloatMatcher : ArgumentMatcher
 	{
 		public override bool TryConvertArgument(string argument, Type argumentType, DevConsole devConsole, out object converted)
 		{
@@ -48,7 +48,7 @@ namespace com.SolePilgrim.DevConsole
 	}
 
 	/// <summary>Converts arguments to string objects using DevConsole's Name Parser.</summary>
-	public class NameMatcher : DevConsoleArgumentMatcher
+	public class NameMatcher : ArgumentMatcher
 	{
 		public override bool TryConvertArgument(string argument, Type argumentType, DevConsole devConsole, out object converted)
 		{
@@ -64,7 +64,7 @@ namespace com.SolePilgrim.DevConsole
 	}
 
 	/// <summary>Converts arguments to string objects.</summary>
-	public class StringMatcher : DevConsoleArgumentMatcher
+	public class StringMatcher : ArgumentMatcher
 	{
 		public override bool TryConvertArgument(string argument, Type argumentType, DevConsole devConsole, out object converted)
 		{
@@ -79,7 +79,7 @@ namespace com.SolePilgrim.DevConsole
 	}
 
 	/// <summary>Converts arguments to Type objects.</summary>
-	public class TypeMatcher : DevConsoleArgumentMatcher
+	public class TypeMatcher : ArgumentMatcher
 	{
 		public override bool TryConvertArgument(string argument, Type argumentType, DevConsole devConsole, out object converted)
 		{
@@ -95,7 +95,7 @@ namespace com.SolePilgrim.DevConsole
 	}
 
 	/// <summary>Converts arguments to objects mapped in DevConsole's InstanceMappers.</summary>
-	public class InstanceMatcher : DevConsoleArgumentMatcher
+	public class InstanceMatcher : ArgumentMatcher
 	{
 		public override bool TryConvertArgument(string argument, Type argumentType, DevConsole devConsole, out object converted)
 		{

@@ -27,12 +27,12 @@ namespace com.SolePilgrim.DevConsole.Unity
 		[MenuItem("SolePilgrim/DevConsole/Update Console Commands")]
 		static private void FindAllConsoleCommands()
 		{
-			DevConsoleCommandSearcher.FindAllConsoleCommands(out var methods, out var macros);
+			CommandSearcher.FindAllConsoleCommands(out var methods, out var macros);
 			Debug.Log($"{nameof(UnityEditorDevConsoleUpdater)}.{nameof(FindAllConsoleCommands)}" +
 				$"\nFound methods: {methods.Count()}\n{string.Join("\n", methods.Select(m => $"-{m.Name}"))}" +
 				$"\nFound macros: {macros.Count()}\n{string.Join("\n", macros.Select(m => $"-{m.Name}"))}");
 			//The methods found here need to become accessible for the Console to call upon the correct objects.
-			var allSerialized = DevConsoleCommandSearcher.ConsoleCommandsToString(methods, macros, Newtonsoft.Json.Formatting.Indented); //TODO remove this indented parameter
+			var allSerialized = CommandSearcher.ConsoleCommandsToString(methods, macros);
 			Debug.Log(allSerialized);
 			CreateOrEditTextAsset(allSerialized);
 		}
